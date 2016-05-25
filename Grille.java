@@ -1,158 +1,69 @@
-package GrilleImpl;
-
-
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+package activite2;
 
 /**
- *
- * @author Carlos Philippe
+ * Interface d'une grille de sudoku.
  */
-public class Grille {
+public interface Grille {
 
     /**
-     * affiche la grille
-     *
-     * @param grille tableau à deux dimension (9*9) representant la grille de
-     * sudoku
+     * Caractere de case vide.
      */
-    public void affichage(int[][] grille) {
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (((j+1) % 3) == 0) {
-                    System.out.print(grille[i][j]+ " | " );
-                } else {
-                    System.out.print(grille[i][j]+ " " );
-                }
-            }
-            System.out.println();
-            if (((i+1) % 3) == 0) {
-                System.out.println("------------------------");
-            }
-        }
-        System.out.println();
-        System.out.println();
-    }
+    static final char EMPTY = '@';
+    /**
+     * Caractere possible a mettre dans la grille
+     *
+     * pour une grille 9x9 : 1..9. pour une grille 16x16: 0..9-a..f.
+     */
+    static final char[] possible = new char[]{'1', '2', '3', '4', '5', '6',
+        '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f'};
 
     /**
-     * recherche une valeur sur une ligne de la grille
-     *
-     * @param k entier à rechercher sur la grille
-     * @param grille tableau à deux dimension (9*9) representant la grille de
-     * sudoku
-     * @param i indice de la ligne à tester
-     * @return false si la valeur est présente et true au cas contraire
+     * @return largeur/hauteur de la grille.
      */
-    public boolean absentSurLigne(int k, int[][] grille, int i) {
-        for (int j = 0; j < 9; j++) {
-            if (grille[i][j] == k) {
-                return false;
-            }
-        }
-        return true;
-    }
+    public int getDimension();
 
     /**
-     * recherche une valeur sur une colonne de la grille
+     * Affecte une valeur dans la grille.
      *
-     * @param k entier à rechercher sur la grille
-     * @param grille tableau à deux dimension (9*9) representant la grille de
-     * sudoku
-     * @param j indice de la colonne à tester
-     * @return false si la valeur est présente et true au cas contraire
+     * @param x position x dans la grille
+     * @param y position y dans la grille
+     * @param value valeur a mettre dans la case
+     * @throw IllegalArgumentException si x ou y sont hors bornes (0-8)
+     * @throw IllegalArgumentException si la valeur est interdite aux vues des
+     * autres valeurs de la grille
+     * @throw IllegalArgumentException si value n'est pas un caractere autorise
+     * ('1',...,'9')
      */
-    public boolean absentSurColonne(int k, int[][] grille, int j) {
-        for (int i = 0; i < 9; i++) {
-            if (grille[i][j] == k) {
-                return false;
-            }
-        }
-        return true;
-    }
+    public void setValue(int x, int y, char value) throws IllegalArgumentException;
 
     /**
-     * recherche une valeur sur une region de la grille
+     * Recupere une valeur de la grille.
      *
-     * @param k entier à rechercher sur la grille
-     * @param grille tableau à deux dimension (9*9) representant la grille de
-     * sudoku
-     * @param i indice de la ligne à tester
-     * @param j indice de la colonne à tester
-     * @return false si la valeur est présente et true au cas contraire
+     * @param x position x dans la grille
+     * @param y position y dans la grille
+     * @return valeur dans la case x,y
+     * @throw IllegalArgumentException si x ou y sont hors bornes (0-8)
      */
-    public boolean absentSurBloc(int k, int[][] grille, int i, int j) {
-        int u = i - (i % 3);
-        int v = j - (j % 3);
-        for (i = u; i < u + 3; i++) {
-            for (j = v; j < v + 3; j++) {
-                if (grille[i][j] == k) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
+    public char getValue(int x, int y) throws IllegalArgumentException;
 
     /**
-     * Test si une valeur est un choix possible et actualise la grille
+     * Test si une grille est terminee.
      *
-     * @param grille tableau à deux dimension (9*9) representant la grille de
-     * sudoku
-     * @param position
-     * @return true si la grille a été actualiser et false si non
+     * @return true si la grille est complete
      */
-    public boolean estValide(int[][] grille, int position) {
-        if (position == 9 * 9) {
-            return true;
-        }
+    public boolean complete();
 
-        int i = position / 9;
-        int j = position % 9;
-
-        if (grille[i][j] != 0) {
-            return estValide(grille, position + 1);
-        }
-
-        for (int k = 1; k <= 9; k++) {
-            if (absentSurLigne(k, grille, i) && absentSurColonne(k, grille, j)
-                    && absentSurBloc(k, grille, i, j)) {
-                grille[i][j] = k;
-
-                if (estValide(grille, position + 1)) {
-                    return true;
-                }
-            }
-        }
-        grille[i][j] = 0;
-        return false;
-    }
-
-    public static void main(String[] Args) {
-        int[][] grille
-                = {
-                    {9, 0, 0, 1, 0, 0, 0, 0, 5},
-                    {0, 0, 5, 0, 9, 0, 2, 0, 1},
-                    {8, 0, 0, 0, 4, 0, 0, 0, 0},
-                    {0, 0, 0, 0, 8, 0, 0, 0, 0},
-                    {0, 0, 0, 7, 0, 0, 0, 0, 0},
-                    {0, 0, 0, 0, 2, 6, 0, 0, 9},
-                    {2, 0, 0, 3, 0, 0, 0, 0, 6},
-                    {0, 0, 0, 2, 0, 0, 9, 0, 0},
-                    {0, 0, 1, 9, 0, 4, 5, 7, 0}
-                };
-        
-        Grille s = new Grille();
-        System.out.println("Affichage avant");       
-        s.affichage(grille);
-        
-        s.estValide(grille,0);
-        
-        System.out.println("Affichage avant");
-        s.affichage(grille);
-        
-    }
+    /**
+     * Test si une valeur est possible dans la grille par rapport a ce qu'elle
+     * contient deja.
+     *
+     * @param x position x dans la grille
+     * @param y position y dans la grille
+     * @param value valeur a mettre dans la case
+     * @throw IllegalArgumentException si x ou y sont hors bornes (0-8)
+     * @throw IllegalArgumentException si value n'est pas un caractere autorise
+     * ('1',...,'9',..)
+     * @return boolean
+     */
+    public boolean possible(int x, int y, char value) throws IllegalArgumentException;
 }
