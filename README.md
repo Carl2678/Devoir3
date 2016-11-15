@@ -1,2 +1,2 @@
 # Devoir3
-#Grille sudoku
+#Grille de jeu sudoku
